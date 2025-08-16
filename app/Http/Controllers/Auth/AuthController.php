@@ -55,7 +55,7 @@ class AuthController extends Controller
      */
     public function showUserLogin()
     {
-        return Inertia::render('Auth/UserLogin', [
+        return Inertia::render('auth/UserLogin', [
             'title' => 'User Login'
         ]);
     }

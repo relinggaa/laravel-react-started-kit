@@ -1,7 +1,8 @@
 import React from 'react';
-import { useForm, Head } from '@inertiajs/react';
+import { useForm, Head,usePage } from '@inertiajs/react';
 
 export default function UserRegister() {
+       const { flash } = usePage().props; 
     const { data, setData, post, processing, errors } = useForm({
         name: '',
         username: '',
@@ -19,7 +20,17 @@ export default function UserRegister() {
     return (
         <div className="min-h-screen bg-gray-100 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
             <Head title="User Registration" />
-            
+                    {flash && flash.success && (
+                    <div className="rounded-md bg-green-50 p-4 mb-4">
+                        <div className="flex">
+                            <div className="ml-3">
+                                <p className="text-sm font-medium text-green-800">
+                                    {flash.success}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                )}
             <div className="sm:mx-auto sm:w-full sm:max-w-md">
                 <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
                     Create your account

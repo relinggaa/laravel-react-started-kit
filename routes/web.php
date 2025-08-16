@@ -51,9 +51,10 @@ Route::middleware('auth')->group(function () {
     });
     
     // User protected routes
-    Route::middleware('user')->prefix('user')->group(function () {
+     Route::middleware('user')->prefix('user')->group(function () {
         Route::get('/dashboard', function () {
-            return inertia('User/Dashboard');
+            // Setelah login, arahkan ke halaman landing
+            return redirect()->route('landing');
         })->name('user.dashboard');
     });
 });

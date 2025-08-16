@@ -6,7 +6,7 @@ use App\Models\Destination;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Storage;
-
+use Illuminate\Support\Facades\Auth;
 class DestinationController extends Controller
 {
     /**
@@ -38,10 +38,11 @@ public function index()
 
 public function indexLanding()
 {
-    $destinations = Destination::all()->map(function($destination) {
+    // Ambil data destinasi dan pastikan images diubah menjadi URL
+    $destinations = Destination::all()->map(function ($destination) {
         // Handle jika images null atau tidak valid
         $images = json_decode($destination->images) ?? [];
-        
+
         // Pastikan $images adalah array sebelum diproses
         if (!is_array($images)) {
             $images = [];
@@ -55,10 +56,22 @@ public function indexLanding()
         return $destination;
     });
 
-    return Inertia::render('landing', [
-        'destinations' => $destinations
-    ]);
+    // Ambil data pengguna yang sedang login
+    $user = Auth::user();
+
+  return Inertia::render('landing', [
+    'destinations' => $destinations,
+    'auth' => [
+        'user' => Auth::user() ? [
+            'id' => Auth::user()->id,
+            'username' => Auth::user()->username,
+            'email' => Auth::user()->email,
+        ] : null
+    ],
+]);
+
 }
+
 
     /**
      * Show the form for creating a new resource.

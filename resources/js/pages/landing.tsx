@@ -29,9 +29,17 @@ interface Destination {
 
 interface LandingProps {
   destinations: Destination[];
+  auth: {
+    user: {
+      id: number;
+      username: string;
+      email: string;
+    } | null;
+  };
 }
 
-export default function Landing({ destinations }: LandingProps) {
+export default function Landing({ destinations, auth }: LandingProps) {
+  const user = auth.user;
   const [activeDestination, setActiveDestination] = useState({
     id: 1,
     name: 'KAWAH IJEN',
@@ -92,11 +100,11 @@ export default function Landing({ destinations }: LandingProps) {
 
   return (
     <>
-      <NavbarLanding />
+<     NavbarLanding user={user} />
       <ParallaxProvider>
     
 
-      <section className="relative h-[80vh] w-full overflow-hidden">
+      <section className="relative h-[80vh] w-full overflow-hidden  ">
         <img
           src={activeDestination.image}
           alt="Background"
