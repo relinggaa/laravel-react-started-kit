@@ -13,6 +13,7 @@
         "inertiajs/inertia-laravel": "^2.0",
         "laravel/framework": "^12.0",
         "laravel/tinker": "^2.10.1",
+        "midtrans/midtrans-php": "*",
         "tightenco/ziggy": "^2.4"
     },
     "require-dev": {
@@ -28,7 +29,8 @@
         "psr-4": {
             "App\\": "app/",
             "Database\\Factories\\": "database/factories/",
-            "Database\\Seeders\\": "database/seeders/"
+            "Database\\Seeders\\": "database/seeders/",
+             "Midtrans\\": "vendor/midtrans/midtrans-php/"
         }
     },
     "autoload-dev": {

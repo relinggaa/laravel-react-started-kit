@@ -57,7 +57,11 @@ Route::middleware('auth')->group(function () {
             return redirect()->route('landing');
         })->name('user.dashboard');
     });
+    
 });
+// Order API Routes
+Route::middleware('auth')->post('/api/create-order', [DestinationController::class, 'createOrder'])->name('order.create');
+Route::middleware('auth')->put('/api/update-order-status/{orderId}', [DestinationController::class, 'updateOrderStatus'])->name('order.update');
 
 // User Registration Routes
 Route::middleware('guest')->group(function () {
@@ -89,6 +93,7 @@ Route::middleware('guest')->group(function () {
     Route::get('/user/login', [AuthController::class, 'showUserLogin'])->name('user.login');
     Route::post('/user/login', [AuthController::class, 'userLogin']);
 });
+
 
 Route::get('/test-email', function() {
     // Cari user dengan ID 17
@@ -133,5 +138,18 @@ Route::get('/test-mailtrap', function() {
         return 'Error: ' . $e->getMessage();
     }
 });
-
-require __DIR__.'/auth.php';
+Route::middleware(['auth'])->group(function () {
+    Route::post('/api/orders', [DestinationController::class, 'createOrder'])->name('order.create');
+});
+// Di web.php
+Route::get('/debug-env', function() {
+    return response()->json([
+        'app_env' => env('APP_ENV'),
+        'midtrans_server_key' => env('MIDTRANS_SERVER_KEY'),
+        'midtrans_client_key' => env('MIDTRANS_CLIENT_KEY'),
+        'midtrans_is_production' => env('MIDTRANS_IS_PRODUCTION'),
+        'config_server_key' => config('midtrans.server_key'),
+        'config_client_key' => config('midtrans.client_key'),
+        'config_is_production' => config('midtrans.is_production'),
+    ]);
+});

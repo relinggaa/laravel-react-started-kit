@@ -11,26 +11,7 @@ use Illuminate\Auth\Events\Registered;
 
 class RegistrationController extends Controller
 {
-    public function showAdminRegistrationForm()
-    {
-        return inertia('Auth/AdminRegister');
-    }
-
-    public function adminRegister(Request $request)
-    {
-        $request->validate([
-            'username' => 'required|string|max:255|unique:users',
-            'password' => 'required|string|min:8|confirmed',
-        ]);
-
-        User::create([
-            'username' => $request->username,
-            'password' => Hash::make($request->password),
-            'role' => 'admin'
-        ]);
-
-        return redirect()->route('admin.login')->with('success', 'Admin registration successful!');
-    }
+  
 
     public function showUserRegistrationForm()
     {

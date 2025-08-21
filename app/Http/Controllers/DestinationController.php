@@ -3,10 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Models\Destination;
+use App\Models\Order;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
+use Midtrans\Snap;
+use Midtrans\Config;
 class DestinationController extends Controller
 {
     /**
@@ -231,7 +235,101 @@ public function show($id)
         'destination' => $destination
     ]);
 }
+public function createOrder(Request $request)
+{
+    \Log::info('Order request received:', $request->all());
+    
+    // Validasi input
+    $validated = $request->validate([
+        'destination_id' => 'required|exists:destinations,id',
+        'package_id' => 'required|integer',
+        'price' => 'required|numeric',
+        'user_id' => 'required|exists:users,id',
+    ]);
 
+    // Konfigurasi Midtrans yang benar
+    Config::$serverKey = config('midtrans.server_key');
+    Config::$clientKey = config('midtrans.client_key');
+    Config::$isProduction = config('midtrans.is_production', false);
+    Config::$isSanitized = true;
+    Config::$is3ds = true;
 
+    // Pastikan server key tidak kosong
+    if (empty(Config::$serverKey)) {
+        \Log::error('Midtrans server key is empty!');
+        return response()->json([
+            'message' => 'Payment gateway configuration error'
+        ], 500);
+    }
 
+    $destination = Destination::findOrFail($validated['destination_id']);
+    $user = User::findOrFail($validated['user_id']);
+
+    // Buat order ID yang unik
+    $orderId = 'ORDER-' . time() . '-' . $validated['user_id'];
+
+    $transactionDetails = [
+        'order_id' => $orderId,
+        'gross_amount' => (int) $validated['price'], // Pastikan integer
+    ];
+
+    $customerDetails = [
+        'first_name' => $user->name,
+        'email' => $user->email,
+        'phone' => $user->phone ?? '',
+    ];
+
+    $itemDetails = [
+        [
+            'id' => (string) $destination->id,
+            'price' => (int) $validated['price'], // Pastikan integer
+            'quantity' => 1,
+            'name' => $destination->name . ' Package ' . ($validated['package_id'] + 1),
+        ]
+    ];
+
+    try {
+        $snapToken = Snap::getSnapToken([
+            'transaction_details' => $transactionDetails,
+            'item_details' => $itemDetails,
+            'customer_details' => $customerDetails,
+        ]);
+
+        // Simpan order ke database
+        $order = Order::create([
+            'order_id' => $orderId,
+            'user_id' => $validated['user_id'],
+            'destination_id' => $validated['destination_id'],
+            'package_id' => $validated['package_id'],
+            'price' => $validated['price'],
+            'status' => 'pending',
+            'snap_token' => $snapToken,
+        ]);
+
+        return response()->json([
+            'snap_token' => $snapToken,
+            'order_id' => $orderId
+        ]);
+        
+    } catch (\Exception $e) {
+        \Log::error('Midtrans error: ' . $e->getMessage());
+        \Log::error('Midtrans error details: ', [
+            'file' => $e->getFile(),
+            'line' => $e->getLine(),
+            'trace' => $e->getTraceAsString()
+        ]);
+        
+        return response()->json([
+            'message' => 'Payment gateway error: ' . $e->getMessage()
+        ], 500);
+    }
+}
+public function updateOrderStatus(Request $request, $orderId)
+{
+    $order = Order::findOrFail($orderId);
+    $order->status = $request->input('status');
+    $order->save();
+
+    return response()->json(['message' => 'Order status updated successfully']);
+}
 }

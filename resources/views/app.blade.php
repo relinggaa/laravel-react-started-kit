@@ -6,6 +6,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Merriweather:ital,opsz,wght@0,18..144,300..900;1,18..144,300..900&display=swap" rel="stylesheet">
+
         {{-- Inline script to detect system dark mode preference and apply it immediately --}}
         <script>
             (function() {
@@ -20,6 +21,12 @@
                 }
             })();
         </script>
+
+  <script
+  src="https://app.sandbox.midtrans.com/snap/snap.js"
+  data-client-key="SB-Mid-client-H6hu6kum7AKuIWiz"
+  type="text/javascript">
+</script>
 
         {{-- Inline style to set the HTML background color based on our theme in app.css --}}
         <style>
