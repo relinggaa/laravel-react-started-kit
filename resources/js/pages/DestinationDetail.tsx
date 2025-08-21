@@ -66,14 +66,29 @@ export default function DestinationDetail({ destination }: { destination: Destin
         document.body.removeChild(script);
     };
 }, []);
+const formatPrice = (priceString: string, index: number): string => {
+  // Menggunakan parsePrice untuk mengonversi string harga menjadi angka
+  const price = parsePrice(priceString);
+  
+  // Format harga menjadi format Rupiah
+  const formattedPrice = price.toLocaleString('id-ID'); // Format angka menjadi IDR
+  
+  // Menambahkan '/pak' sesuai dengan index
+  return `Rp ${formattedPrice} /${index + 1}pak`; // Index + 1 untuk label 1/pak, 2/pak, dst
+};
+
   // Handle package selection
   const handlePackageSelect = (index: number) => {
     setSelectedPackageIndex(index);
   };
   // Fungsi untuk mengonversi format harga string ke angka
+// Fungsi untuk mengonversi format harga string ke angka
 const parsePrice = (priceString: string): number => {
-  // Remove any characters that are not digits or commas (for thousands separator)
-  const numericString = priceString.replace(/[^\d]/g, '');
+  // Remove 'Rp', commas, and anything after '/' (including the slash itself)
+  const numericString = priceString
+    .replace('Rp', '')           // Remove the 'Rp' currency symbol
+    .replace(/[^\d]/g, '')       // Remove any non-numeric characters, including commas
+    .split('/')[0];              // Split by '/' and take the first part, removing anything after '/'
 
   // Convert the cleaned numeric string to an integer
   const price = parseInt(numericString, 10);
@@ -81,6 +96,7 @@ const parsePrice = (priceString: string): number => {
   // If the result is NaN (invalid), return 0
   return isNaN(price) ? 0 : price;
 };
+
 
 // Kirim data pemesanan menggunakan `user_id` dari auth
 // Ganti kode handleOrderSubmit dengan ini:
@@ -201,21 +217,22 @@ useEffect(() => {
             </div>
 
             {/* Packages Section */}
-            <div className="mb-8">
-              <h2 className="text-2xl font-semibold mb-4">Pilih Paket</h2>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                {destination.price.map((pkg, index) => (
-                  <div
-                    key={index}
-                    className={`bg-white rounded-lg shadow-lg p-6 flex flex-col items-center cursor-pointer transition-transform transform ${selectedPackageIndex === index ? 'scale-105 border-2 border-blue-600' : ''}`}
-                    onClick={() => handlePackageSelect(index)}
-                  >
-                    <h3 className="text-xl font-semibold mb-4">Paket {index + 1}</h3>
-                    <p className="text-lg font-bold text-blue-600">Harga: {destination.price[index] || 'Hubungi kami'}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
+       <div className="mb-8">
+  <h2 className="text-2xl font-semibold mb-4">Pilih Paket</h2>
+  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+    {destination.price.map((pkg, index) => (
+      <div
+        key={index}
+        className={`bg-white rounded-lg shadow-lg p-6 flex flex-col items-center cursor-pointer transition-transform transform ${selectedPackageIndex === index ? 'scale-105 border-2 border-blue-600' : ''}`}
+        onClick={() => handlePackageSelect(index)}
+      >
+        <h3 className="text-xl font-semibold mb-4">Paket {index + 1}</h3>
+        <p className="text-lg font-bold text-blue-600">{formatPrice(pkg, index)}</p>
+      </div>
+    ))}
+  </div>
+</div>
+
 
             {/* Rundown Section */}
             <div className="mb-8">
@@ -252,9 +269,15 @@ useEffect(() => {
 
               <div className="mb-6">
                 <h4 className="font-semibold text-gray-600">Harga</h4>
-                <p className="text-2xl font-bold text-blue-600">
+                <p className="text-2xl font-bold text-blue-600 hidden">
                   {selectedPackageIndex !== null ? destination.price[selectedPackageIndex] : 'Pilih Paket'}
                 </p>
+               <p className="text-2xl font-bold text-blue-600 ">
+                  {selectedPackageIndex !== null 
+                    ? formatPrice(destination.price[selectedPackageIndex], selectedPackageIndex)
+                    : 'Pilih Paket'}
+                </p>
+
               </div>
 
               {/* Booking Button */}

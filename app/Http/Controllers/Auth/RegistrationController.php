@@ -47,6 +47,8 @@ class RegistrationController extends Controller
         auth()->login($user);
 
         // Redirect ke halaman verifikasi email
-        return redirect()->route('verification.notice');
+       return redirect()->route('verification.notice')->with([
+        'success' => 'Registration successful! Please check your email for verification link.'
+    ]);
     }
 }

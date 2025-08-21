@@ -1,8 +1,15 @@
 import React from 'react';
 import { usePage, Head } from '@inertiajs/react';
 
+type PageProps = {
+    flash?: {
+        success?: string;
+    };
+    [key: string]: any;
+};
+
 export default function VerifyEmail() {
-    const { props } = usePage();
+    const { props } = usePage<PageProps>();
     
     return (
         <div className="min-h-screen bg-gray-100 flex flex-col justify-center py-12 sm:px-6 lg:px-8">

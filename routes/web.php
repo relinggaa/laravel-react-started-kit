@@ -2,12 +2,14 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\DestinationController;
+use App\Http\Controllers\OrderController;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Auth\RegistrationController;
-
+use Illuminate\Foundation\Auth\EmailVerificationRequest;
+use App\Http\Controllers\MidtransController; 
 Route::get('/', [DestinationController::class, 'indexLanding'])->name('landing');
 Route::get('/destinations/{id}', [DestinationController::class, 'show'])->name('destinations.show');
-
+Route::post('/midtrans/notification', [MidtransController::class, 'handleNotification'])->name('midtrans.notification');
 // Admin Routes
 Route::prefix('admin')->group(function () {
     // Admin Login Routes
@@ -29,6 +31,7 @@ Route::prefix('admin')->group(function () {
 
     // CRUD destinasi
     Route::middleware(['auth', 'admin'])->resource('destinations', DestinationController::class)->except(['show']);
+    Route::middleware(['auth', 'admin'])->get('/orders', [OrderController::class, 'index'])->name('admin.orders');
 });
 
 // User Routes
@@ -73,13 +76,18 @@ Route::middleware('guest')->group(function () {
 // Email Verification Routes
 Route::middleware('auth')->group(function () {
     Route::get('/email/verify', function () {
-        return inertia('Auth/VerifyEmail');
+        return inertia('auth/VerifyEmail');
     })->name('verification.notice');
 
+    // PERBAIKI ROUTE INI
     Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {
         $request->fulfill();
-        auth()->logout();
-        return redirect()->route('user.login')->with('success', 'Email verified successfully! You can now login.');
+
+        // JANGAN logout langsung, biarkan user tetap login
+        // auth()->logout();
+
+        
+        return redirect()->route('landing')->with('success', 'Email verified successfully!');
     })->middleware(['signed'])->name('verification.verify');
 
     Route::post('/email/verification-notification', function (Request $request) {

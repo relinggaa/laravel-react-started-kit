@@ -1,8 +1,12 @@
 import React from 'react';
 import { useForm, Head,usePage } from '@inertiajs/react';
 
+type FlashProps = {
+    success?: string;
+};
+
 export default function UserRegister() {
-       const { flash } = usePage().props; 
+    const { flash } = usePage<{ flash?: FlashProps }>().props;
     const { data, setData, post, processing, errors } = useForm({
         name: '',
         username: '',

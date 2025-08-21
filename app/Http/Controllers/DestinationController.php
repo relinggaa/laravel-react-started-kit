@@ -18,7 +18,7 @@ class DestinationController extends Controller
      */
 public function index()
 {
-    $destinations = Destination::all()->map(function($destination) {
+    $destinations = Destination::orderBy('created_at', 'desc')->get()->map(function($destination) {
         // Handle jika images null atau tidak valid
         $images = json_decode($destination->images) ?? [];
         
