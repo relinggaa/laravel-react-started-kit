@@ -60,20 +60,38 @@ public function indexLanding()
         return $destination;
     });
 
+    // Ambil data testimoni yang sudah approved dengan relasi user
+    $testimonials = \App\Models\Testimonial::with(['user', 'destination'])
+        ->where('is_approved', true)
+        ->orderBy('created_at', 'desc')
+        ->get()
+        ->map(function ($testimonial) {
+            return [
+                'id' => $testimonial->id,
+                'user_name' => $testimonial->user->name,
+                'user_username' => '@' . strtolower(str_replace(' ', '', $testimonial->user->name)),
+                'destination_name' => $testimonial->destination->name ?? 'Destinasi',
+                'content' => $testimonial->content,
+                'rating' => $testimonial->rating,
+                'image_url' => $testimonial->image_url,
+                'created_at' => $testimonial->created_at->format('d M Y'),
+            ];
+        });
+
     // Ambil data pengguna yang sedang login
     $user = Auth::user();
 
-  return Inertia::render('landing', [
-    'destinations' => $destinations,
-    'auth' => [
-        'user' => Auth::user() ? [
-            'id' => Auth::user()->id,
-            'username' => Auth::user()->username,
-            'email' => Auth::user()->email,
-        ] : null
-    ],
-]);
-
+    return Inertia::render('landing', [
+        'destinations' => $destinations,
+        'testimonials' => $testimonials, // Kirim data testimoni ke frontend
+        'auth' => [
+            'user' => Auth::user() ? [
+                'id' => Auth::user()->id,
+                'username' => Auth::user()->username,
+                'email' => Auth::user()->email,
+            ] : null
+        ],
+    ]);
 }
 
 

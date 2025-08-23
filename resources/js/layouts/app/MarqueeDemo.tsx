@@ -41,7 +41,10 @@ const ReviewCard = ({ img }: { img: string }) => {
 export function MarqueeDemo() {
   return (
     <div className="bg-blue-50 relative w-full  flex flex-col items-center justify-center overflow-hidden ">
+     
+
       <Parallax speed={100}> 
+
       <Marquee pauseOnHover className="[--duration:20s]">
         <div className="w-4xl flex space-x-2">
           {firstRow.map((review) => (

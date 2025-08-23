@@ -29,4 +29,9 @@ class Order extends Model
     {
         return $this->belongsTo(Destination::class);
     }
+
+    public function testimonial()
+    {
+        return $this->hasOne(Testimonial::class);
+    }
 }

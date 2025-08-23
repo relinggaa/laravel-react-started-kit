@@ -1,6 +1,6 @@
-import React from 'react';
-import { Head, Link, usePage } from '@inertiajs/react';
-import AdminLayout from '@/layouts/app/AdminLayout'; // Import AdminLayout
+import React, { useState } from 'react';
+import { Head, Link, usePage, useForm, router } from '@inertiajs/react';
+import AdminLayout from '@/layouts/app/AdminLayout';
 
 interface Order {
   id: number;
@@ -20,12 +20,15 @@ interface PageProps {
   orders: Order[];
   flash?: {
     success?: string;
+    error?: string;
   };
   [key: string]: unknown;
 }
 
 const ListOrder = ({ orders }: PageProps) => {
   const { flash } = usePage<PageProps>().props;
+  const [editingOrder, setEditingOrder] = useState<number | null>(null);
+  const [selectedStatus, setSelectedStatus] = useState<string>('');
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -35,6 +38,8 @@ const ListOrder = ({ orders }: PageProps) => {
         return 'bg-yellow-100 text-yellow-800';
       case 'failed':
         return 'bg-red-100 text-red-800';
+      case 'completed':
+        return 'bg-blue-100 text-blue-800';
       case 'canceled':
         return 'bg-gray-100 text-gray-800';
       default:
@@ -42,12 +47,47 @@ const ListOrder = ({ orders }: PageProps) => {
     }
   };
 
+  const handleEditClick = (order: Order) => {
+    setEditingOrder(order.id);
+    setSelectedStatus(order.status);
+  };
+
+  const handleStatusChange = (orderId: number, newStatus: string) => {
+    router.put(`/admin/orders/${orderId}/status`, {
+      status: newStatus
+    }, {
+      onSuccess: () => {
+        setEditingOrder(null);
+        setSelectedStatus('');
+      }
+    });
+  };
+
+  const handleCancelEdit = () => {
+    setEditingOrder(null);
+    setSelectedStatus('');
+  };
+
+  const statusOptions = [
+    { value: 'pending', label: 'Pending', color: 'bg-yellow-100 text-yellow-800' },
+    { value: 'success', label: 'Success', color: 'bg-green-100 text-green-800' },
+    { value: 'completed', label: 'Completed', color: 'bg-blue-100 text-blue-800' },
+    { value: 'failed', label: 'Failed', color: 'bg-red-100 text-red-800' },
+    { value: 'canceled', label: 'Canceled', color: 'bg-gray-100 text-gray-800' },
+  ];
+
   return (
-    <AdminLayout title="Daftar Order"> {/* Use AdminLayout here */}
+    <AdminLayout title="Daftar Order">
       <div className="p-6">
         {flash?.success && (
           <div className="mb-4 p-3 bg-green-100 text-green-700 rounded-md">
             {flash.success}
+          </div>
+        )}
+        
+        {flash?.error && (
+          <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-md">
+            {flash.error}
           </div>
         )}
 
@@ -109,20 +149,48 @@ const ListOrder = ({ orders }: PageProps) => {
                       Rp {order.price}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(order.status)}`}>
-                        {order.status}
-                      </span>
+                      {editingOrder === order.id ? (
+                        <div className="flex items-center space-x-2">
+                          <select
+                            value={selectedStatus}
+                            onChange={(e) => setSelectedStatus(e.target.value)}
+                            className="rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                          >
+                            {statusOptions.map((option) => (
+                              <option key={option.value} value={option.value}>
+                                {option.label}
+                              </option>
+                            ))}
+                          </select>
+                          <button
+                            onClick={() => handleStatusChange(order.id, selectedStatus)}
+                            className="px-2 py-1 bg-green-500 text-white rounded-md text-xs hover:bg-green-600"
+                          >
+                            Simpan
+                          </button>
+                          <button
+                            onClick={handleCancelEdit}
+                            className="px-2 py-1 bg-gray-500 text-white rounded-md text-xs hover:bg-gray-600"
+                          >
+                            Batal
+                          </button>
+                        </div>
+                      ) : (
+                        <span className={`px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(order.status)}`}>
+                          {statusOptions.find(opt => opt.value === order.status)?.label || order.status}
+                        </span>
+                      )}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       {order.created_at}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                      <Link
-                        href="#"
+                      <button
+                        onClick={() => handleEditClick(order)}
                         className="text-indigo-600 hover:text-indigo-900 mr-3"
                       >
-                        Edit
-                      </Link>
+                        Edit Status
+                      </button>
                       <Link
                         href="#"
                         className="text-red-600 hover:text-red-900"

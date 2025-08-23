@@ -52,7 +52,7 @@ const NavbarLanding: React.FC<NavbarLandingProps> = ({ user }) => {
   return (
     <>
       <header
-        className={`nav fixed top-0 left-0 right-0 z-50 shadow transition-all duration-300 ${
+        className={`flex  justify-center nav fixed top-0 left-0 right-0 z-50 shadow transition-all duration-300 ${
           isScrolled && isDesktop ? "w-full" : "mx-auto navbar-responsive"
         } bg-white`}
         style={{ width: isScrolled && isDesktop ? "100%" : "70%" }}
@@ -73,10 +73,11 @@ const NavbarLanding: React.FC<NavbarLandingProps> = ({ user }) => {
             </svg>
           </label>
 
-          <nav
-            aria-label="Header Navigation"
-            className="peer-checked:mt-8 peer-checked:max-h-56 flex max-h-0 w-full flex-col items-center justify-between overflow-hidden transition-all xl:flex xl:flex-row xl:ml-24 xl:max-h-full xl:items-start"
-          >
+         <nav
+          aria-label="Header Navigation"
+          className={`peer-checked:mt-8 peer-checked:max-h-56 flex max-h-0 w-full flex-col items-center justify-center overflow-hidden transition-all xl:flex xl:flex-row xl:ml-24 xl:max-h-full xl:items-start xl:justify-center`}
+        >
+
             <ul className="flex flex-col items-center space-y-2 xl:flex-row xl:ml-auto xl:space-y-0 oswald">
               <li className="text-gray-600 xl:mr-12 hover:text-blue-400">
                 <ScrollLink to="home" spy={true} smooth={true} duration={500} hashSpy={true} className="cursor-pointer">
@@ -84,20 +85,21 @@ const NavbarLanding: React.FC<NavbarLandingProps> = ({ user }) => {
                 </ScrollLink>
               </li>
               <li className="text-gray-600 xl:mr-12 hover:text-blue-400">
-                <ScrollLink to="opentrip" spy={true} smooth={true} duration={500} hashSpy={true} className="cursor-pointer">
-                  Open Trip
+                <ScrollLink to="about" spy={true} smooth={true} duration={500} hashSpy={true} className="cursor-pointer">
+                  About 
                 </ScrollLink>
               </li>
               <li className="text-gray-600 xl:mr-12 hover:text-blue-400">
-                <ScrollLink to="eventorganizer" spy={true} smooth={true} duration={500} hashSpy={true} className="cursor-pointer">
-                  Event Organizer
+                <ScrollLink to="destinations" spy={true} smooth={true} duration={500} hashSpy={true} className="cursor-pointer">
+                Package
                 </ScrollLink>
               </li>
               <li className="text-gray-600 xl:mr-12 hover:text-blue-400">
-                <ScrollLink to="aboutus" spy={true} smooth={true} duration={500} hashSpy={true} className="cursor-pointer">
-                  About Us
+                <ScrollLink to="testimoni" spy={true} smooth={true} duration={500} hashSpy={true} className="cursor-pointer">
+                Testimoni
                 </ScrollLink>
               </li>
+          
               <li className="text-gray-600 xl:mr-12">
                 <div className="my-4 flex items-center space-x-6 space-y-2 xl:my-0 xl:ml-auto xl:space-x-8 xl:space-y-0">
                   {user ? (
@@ -138,9 +140,9 @@ const NavbarLanding: React.FC<NavbarLandingProps> = ({ user }) => {
             }}
           >
             <ul className="py-1 text-sm text-gray-700">
-              <li>
-                <a href="#" className="block px-4 py-2 hover:bg-gray-100">Pesanan saya</a>
-              </li>
+                      <Link href={route('user.orders')} className="block px-4 py-2 hover:bg-gray-100">
+            Pesanan saya
+          </Link>
           
             </ul>
             <ul className="py-1 text-sm text-gray-700">

@@ -146,6 +146,7 @@ const handleSubmit = (e: React.FormEvent) => {
                     value={data.location}
                     onChange={(e) => setData('location', e.target.value)}
                     className="w-full px-4 py-2 border rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                       placeholder="Contoh: Banyuwangi Selatan"
                 />
                 {errors.location && <p className="text-red-500 text-sm mt-1">{errors.location}</p>}
                 </div>
@@ -158,13 +159,14 @@ const handleSubmit = (e: React.FormEvent) => {
                     value={data.spot}
                     onChange={(e) => setData('spot', e.target.value)}
                     className="w-full px-4 py-2 border rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                      placeholder="Contoh: Pantai"
                 />
                 {errors.spot && <p className="text-red-500 text-sm mt-1">{errors.spot}</p>}
                 </div>
 
                 {/* Package */}
                 <div className="md:col-span-2">
-                <label className="block text-gray-700 mb-2">Paket Wisata</label>
+                <label className="block text-gray-700 mb-2">Paket Lokasi Wisata</label>
                 {data.package.map((pkg, index) => (
                     <div key={index} className="flex mb-2">
                     <input
@@ -176,6 +178,7 @@ const handleSubmit = (e: React.FormEvent) => {
                         setData('package', newPackages);
                         }}
                         className="flex-1 px-4 py-2 border rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                          placeholder="Contoh: Kawah Ijen"
                     />
                     {data.package.length > 1 && (
                         <button
@@ -200,7 +203,11 @@ const handleSubmit = (e: React.FormEvent) => {
 
                 {/* Rundown */}
                 <div className="md:col-span-2">
+                  
                 <label className="block text-gray-700 mb-2">Rundown Kegiatan</label>
+                  <div className="text-sm text-gray-600 mb-2">
+                  * Isi dengan format waktu - deskripsi kegiatan (misal: 13:00 - 14:00 Berangkat)
+                    </div>
                 {data.rundown.map((item, index) => (
                     <div key={index} className="flex mb-2">
                     <input
@@ -236,36 +243,35 @@ const handleSubmit = (e: React.FormEvent) => {
 
                 {/* Price */}
                 <div className="md:col-span-2">
+                  
                 <label className="block text-gray-700 mb-2">Harga Paket</label>
-               {data.price.map((prc, index) => (
-  <div key={index} className="flex mb-2">
-    <input
-      type="text"
-      value={prc}
-      onChange={(e) => {
-        // Hanya biarkan angka dan titik (untuk ribuan)
-        const cleanedValue = e.target.value.replace(/[^0-9]/g, ''); // Hapus karakter non-angka selain titik
-        const newPrices = [...data.price];
-        newPrices[index] = cleanedValue; // Set nilai harga baru
-        setData('price', newPrices);
-      }}
-      className="flex-1 px-4 py-2 border rounded-lg focus:ring-blue-500 focus:border-blue-500"
-      inputMode="numeric" // Memungkinkan hanya input angka
-      pattern="[0-9]*" // Memastikan hanya angka yang bisa dimasukkan
-    />
-    {data.price.length > 1 && (
-      <button
-        type="button"
-        onClick={() => removeField('price', index)}
-        className="ml-2 px-3 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600"
-      >
-        Hapus
-      </button>
-    )}
-  </div>
-))}
-
-   
+                  <div className="text-sm text-gray-600 mb-2">
+                  * Contoh input harga: 1500000
+                    </div>
+                {data.price.map((prc, index) => (
+                    <div key={index} className="flex mb-2">
+                    <input
+                        type="text"
+                        value={prc}
+                        
+                        onChange={(e) => {
+                        const newPrices = [...data.price];
+                        newPrices[index] = e.target.value;
+                        setData('price', newPrices);
+                        }}
+                        className="flex-1 px-4 py-2 border rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                    />
+                    {data.price.length > 1 && (
+                        <button
+                        type="button"
+                        onClick={() => removeField('price', index)}
+                        className="ml-2 px-3 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600"
+                        >
+                        Hapus
+                        </button>
+                    )}
+                    </div>
+                ))}
                 <button
                     type="button"
                     onClick={() => addField('price')}

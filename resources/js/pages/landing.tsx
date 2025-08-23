@@ -12,6 +12,7 @@
   import pulaumerah from '@/assets/pulaumerah.jpg';
   import bedil from '@/assets/bedil.jpeg';
   import  {MarqueeDemo} from '../layouts/app/MarqueeDemo';
+  import  {MarqueeTesti} from '../layouts/app/MarqueTesti';
   import AboutUs from '../layouts/app/AboutUs';
   import Open from '@/components/Open';
   interface Destination {
@@ -29,6 +30,7 @@
 
   interface LandingProps {
     destinations: Destination[];
+         testimonials: Testimonial[]; 
     auth: {
       user: {
         id: number;
@@ -37,8 +39,20 @@
       } | null;
     };
   }
+  interface Testimonial {
+        id: number;
+        user_name: string;
+        user_username: string;
+        destination_name: string;
+        content: string;
+        rating: number;
+        image_url: string | null;
+        created_at: string;
+      }
+      
+  export default function Landing({ destinations, auth,testimonials }: LandingProps) {
 
-  export default function Landing({ destinations, auth }: LandingProps) {
+
     const user = auth.user;
     const [activeDestination, setActiveDestination] = useState({
       id: 1,
@@ -85,7 +99,7 @@
         image: bedil
       }
     ];
-
+    
     const handlePrev = () => {
       if (swiperRef.current) {
         swiperRef.current.slidePrev();
@@ -97,14 +111,28 @@
         swiperRef.current.slideNext();
       }
     };
+      const formatPrice = (priceString: string): string => {
+      // Menghapus karakter non-numerik dan mengonversi string menjadi angka
+      const price = parseFloat(priceString.replace(/[^\d.-]/g, ''));
 
+      // Memeriksa apakah harga valid
+      if (isNaN(price)) {
+        return 'Harga tidak valid';
+      }
+
+      // Format harga menjadi format Rupiah
+      const formattedPrice = price.toLocaleString('id-ID'); // Format angka menjadi IDR
+
+      // Menambahkan '/pak' di akhir
+      return `Rp ${formattedPrice} /pak`;
+    };
     return (
       <>
   <     NavbarLanding user={user} />
         <ParallaxProvider>
       
 
-        <section className="relative h-[80vh] w-full overflow-hidden  ">
+        <section id='home' className="relative h-[80vh] w-full overflow-hidden  ">
           <img
             src={activeDestination.image}
             alt="Background"
@@ -128,10 +156,10 @@
               </div>
               <div className="mt-10 flex flex-col items-center md:flex-row">
             <a 
-    href="/" 
+    href="#destinations" 
     className="mb-3 inline-flex h-12 w-full items-center justify-center rounded bg-[#2563EB]     px-6 font-medium tracking-wide text-white shadow-md transition md:mr-4 md:mb-0 md:w-auto focus:outline-none hover:bg-[#465658] "
   >
-    Stream Now
+    Lihat Paket
   </a>
     
                 <a href="/" aria-label="" className="group inline-flex items-center font-semibold text-white"
@@ -271,20 +299,24 @@
     </div>
   </section>
 
-    
-        <MarqueeDemo/>
-    
+  
 
+     
+          
+            <MarqueeDemo />
 
-
+         
 
 
   </ParallaxProvider>
-    <AboutUs />
+  <section id='about'>
+     <AboutUs />       
+  </section>
+    
         {/* Destination Cards Section */}
-      <section id="card" className="py-12 bg-gray-50">
+      <section id="destinations" className="py-12 bg-gray-50 pt-32 ">
           <div className="container mx-auto px-4">
-            <h2 className="mb-8 text-3xl font-bold text-center">Explore Our Destinations</h2>
+            <h2 className="mb-8 text-4xl font-bold text-center">Explore Our <span className="text-blue-600">Destinations</span></h2>
             <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
               {destinations.map((destination) => (
                 <div key={destination.id} className="group overflow-hidden rounded-2xl bg-white shadow-xl transition duration-200 hover:-translate-y-2">
@@ -319,8 +351,8 @@
                     <div className="mb-4">
                       <h4 className="font-semibold mb-1">Harga Mulai:</h4>
                       <p className="text-blue-600 font-medium">
-                        {destination.price[0] || 'Hubungi kami'}
-                      </p>
+                      {destination.price.length > 0 ? formatPrice(destination.price[0]) : 'Hubungi kami'}
+                    </p>
                     </div>
                     
                     <div className="flex justify-between items-center">
@@ -353,6 +385,14 @@
             </div>
           </div>
         </section>
+      {/* Testimonial Section */}
+     <section className="mt-16 pt-32 py-12 " id="testimoni">
+          <div className="container mx-auto px-4">
+            <h2 className="mb-8 text-4xl font-bold text-center">Apa Kata Dari <span className="text-blue-600">Customer Kami?</span></h2>
+            <MarqueeTesti testimonials={testimonials} />
+          </div>
+        </section>
+     
       </>
     );
   }

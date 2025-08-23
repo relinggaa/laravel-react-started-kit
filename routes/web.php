@@ -3,6 +3,8 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\DestinationController;
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\UserOrderController;
+use App\Http\Controllers\AdminTestimonialController;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Auth\RegistrationController;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
@@ -15,7 +17,8 @@ Route::prefix('admin')->group(function () {
     // Admin Login Routes
     Route::get('/login', [AuthController::class, 'showAdminLogin'])->name('admin.login');
     Route::post('/login', [AuthController::class, 'adminLogin']);
-
+    // Di dalam prefix('admin') atau middleware('auth', 'admin')
+    Route::middleware(['auth', 'admin'])->put('/orders/{order}/status', [OrderController::class, 'updateStatus'])->name('admin.orders.updateStatus');
     // Rute untuk create dan edit destinasi
     Route::get('/destinations/create', [DestinationController::class, 'create'])->name('destinations.create');
     Route::get('/destinations/{destination}/edit', [DestinationController::class, 'edit'])->name('destinations.edit');
@@ -33,7 +36,13 @@ Route::prefix('admin')->group(function () {
     Route::middleware(['auth', 'admin'])->resource('destinations', DestinationController::class)->except(['show']);
     Route::middleware(['auth', 'admin'])->get('/orders', [OrderController::class, 'index'])->name('admin.orders');
 });
-
+// Admin testimonial routes
+Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
+    Route::get('/testimonials', [AdminTestimonialController::class, 'index'])->name('admin.testimonials');
+    Route::put('/testimonials/{id}/approve', [AdminTestimonialController::class, 'approve'])->name('admin.testimonials.approve');
+    Route::put('/testimonials/{id}/reject', [AdminTestimonialController::class, 'reject'])->name('admin.testimonials.reject');
+    Route::delete('/testimonials/{id}', [AdminTestimonialController::class, 'destroy'])->name('admin.testimonials.destroy');
+});
 // User Routes
 Route::prefix('user')->group(function () {
     Route::get('/register', [RegistrationController::class, 'showUserRegisterForm'])->name('user.register');
@@ -41,6 +50,8 @@ Route::prefix('user')->group(function () {
     
     Route::get('/login', [AuthController::class, 'showUserLogin'])->name('user.login');
     Route::post('/login', [AuthController::class, 'userLogin']);
+
+
 });
 
 // Protected Routes
@@ -61,6 +72,10 @@ Route::middleware('auth')->group(function () {
         })->name('user.dashboard');
     });
     
+});
+Route::middleware(['auth', 'user'])->group(function () {
+    Route::get('/user/orders', [UserOrderController::class, 'index'])->name('user.orders');
+    Route::post('/user/testimonials', [UserOrderController::class, 'storeTestimonial'])->name('user.testimonials.store');
 });
 // Order API Routes
 Route::middleware('auth')->post('/api/create-order', [DestinationController::class, 'createOrder'])->name('order.create');

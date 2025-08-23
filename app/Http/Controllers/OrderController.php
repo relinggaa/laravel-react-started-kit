@@ -50,13 +50,13 @@ class OrderController extends Controller
         $order = Order::findOrFail($id);
         
         $request->validate([
-            'status' => 'required|in:pending,success,failed,canceled'
+            'status' => 'required|in:pending,success,failed,completed,canceled'
         ]);
 
         $order->status = $request->status;
         $order->save();
 
-        return redirect()->back()->with('success', 'Order status updated successfully.');
+        return redirect()->back()->with('success', 'Status order berhasil diupdate.');
     }
 
     /**
